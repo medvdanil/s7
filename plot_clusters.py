@@ -26,7 +26,6 @@ if __name__ == "__main__":
     intv_min = []   
     intv_max = []
     names = ['booking', 'DC', "RASK"]
-    names_rus = ['загрузки', 'доходной ставки', 'RASK']
     for i_n in range(len(names)):
         imn, imx = conf_intervals(rm_bad_data(x[:, n_days * i_n:n_days * (i_n + 1)], i_n), labels, 0.05)
         intv_min.append(imn)
@@ -42,16 +41,13 @@ if __name__ == "__main__":
     colors = cm.rainbow(np.linspace(0, 1, 1+ labels.max()))
     plt.rc('font', family='DejaVu Sans')
 
-    joblib.dump((intv_min[0], intv_max[0], centers[0]), "iic.dump", compress=9)
     for i_n in range(len(names)):
         for k in range(labels.max() + 1):
             values = centers[i_n][k]
             e_min = values - intv_min[i_n][:, k]
             e_max = intv_max[i_n][:, k] - values
-            joblib.dump((values, e_min, e_max), "vee.dump", compress=9)
-            # plt.errorbar(np.arange(n_days), values, yerr=np.vstack((e_min, e_max)), ecolor=colors[k], color=colors[k])
-            plt.plot(values, linewidth=3, color=colors[k], label="%d, профиль эволюции %s" % (k, names_rus[i_n]))
-            
+            plt.errorbar(np.arange(n_days), values, yerr=np.vstack((e_min, e_max)), ecolor=colors[k], color=colors[k])
+            plt.plot(values, linewidth=3, color=colors[k], label="%d, профиль эволюции загрузки" % k)
         plt.legend(prop={'size':6})
         plt.savefig('IBP_graphics_%s.png' % names[i_n])
         plt.clf()
